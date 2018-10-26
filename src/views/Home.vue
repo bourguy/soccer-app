@@ -6,7 +6,7 @@
     <main>
 
     <div class="fixed_width">
-    <button v-if="!victory && !start" id="btn" class="" v-on:click="getQuestion">Start quiz</button>
+    <button v-if="!victory && !start" id="btn" class="button" v-on:click="getQuestion">Start quiz</button>
 
       <div v-for="(question, index) in questions" v-if="isQuestion[index]" v-bind:id="`wrapper${step}`">
         <div class="question" v-bind:id="`question${step}`">
@@ -208,37 +208,43 @@ export default {
        console.log("player id:" + random_number);
       const api_url = "https://api.football-data.org/v2/players/" + random_number.toString();
 
-      // a enlever si api is down
-/*
-      axios.get(api_url)
+      // a mettre a jour si api is down
+      api_status = "up";
 
-      .then((response)  =>  {
-        this.loading = false;
-        this.player = response.data;
-      // fin de "a enlever si api is down" 
-*/
-        
-    this.player.name = "Marcelo"
-    //"firstName": "Marcelo",
-    //"lastName": null,
-    this.player.dateOfBirth = "1988-05-12"
-    //"countryOfBirth": "Brazil",
-    //"nationality": "Brazil",
-    //"position": "Defender",
-    // this.player.shirtNumber = 12;
-    
-    
-    if (this.isAnswered[0] === true)
-      {      
-      this.player.name = "Messi" 
-      this.player.dateOfBirth = "1985-05-12";
-      }
-    
-   if (this.isAnswered[1] === true)
-      {      
-      this.player.name = "Ronaldo" 
-      this.player.dateOfBirth = "1983-05-12";
-      }
+      if (api_status == "up")
+        {
+        axios.get(api_url)
+
+        .then((response)  =>  {
+          this.loading = false;
+          this.player = response.data;
+        }
+      else
+        {
+        this.player.name = "Marcelo"
+            //"firstName": "Marcelo",
+            //"lastName": null,
+            this.player.dateOfBirth = "1988-05-12"
+            //"countryOfBirth": "Brazil",
+            //"nationality": "Brazil",
+            //"position": "Defender",
+            // this.player.shirtNumber = 12;
+            
+            
+        if (this.isAnswered[0] === true)
+          {      
+          this.player.name = "Messi" 
+          this.player.dateOfBirth = "1985-05-12";
+          }
+            
+        if (this.isAnswered[1] === true)
+            {      
+            this.player.name = "Ronaldo" 
+            this.player.dateOfBirth = "1983-05-12";
+            }
+
+        }
+      
 
 
     this.playerName = this.player.name;
@@ -373,6 +379,12 @@ button {
   border: 0;
 }
 
+.button:hover {
+      -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+}
+
 .question {
   display: block;
   position: relative;
@@ -391,16 +403,22 @@ button {
   width:100%;
   vertical-align: middle;
   margin: 2px;
-
     top: 40%;
     left: 40%;
     height: 30%;
     width: 40%;
- 
-} 
+ opacity: 0.8;
+}
+
+.answer:hover
+{
+  opacity:1;
+  /*transition:color .2s ease-out, background 1s ease-in;*/
+
+}
 
 .good {
-  background: green;
+  background: #9ACD32;
 	margin:1px;
   width:200px;
   height: 50px;
@@ -414,7 +432,7 @@ button {
 }
 
 .bad {
-  background: red;
+  background: #FF6347;
 	margin:1px;
   width:200px;
   height: 50px;

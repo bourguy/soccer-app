@@ -1,63 +1,79 @@
 <template>
 
 <div id="app">
- <h1> {{ message }}  </h1>
-
-<div class="answer" v-for="(answer, index) in answers">
-
-<div v-bind:id="index" v-on:click="makeActive" v-bind:class="classObject">TESTs</div>
-</div>
-
-
+<h1>
+<input v-model="data.price" placeholder="edit me">
+<p>price is: {{ data.price }}</p>
+<input v-model="data.quantity" placeholder="edit me">
+<p>quantity is: {{ data.quantity }}</p>
+<p>total is: {{ data.total }}</p>
+</h1>
 </div>
 
 </template>
 
 <script>
 
+ let data = { price: 5, quantity: 2 }
+  
+    let target = null
+    
+    // This is exactly the same Dep class
+    class Dep {
+      constructor () {
+        this.subscribers = [] 
+      }
+      depend() {  
+        if (target && !this.subscribers.includes(target)) {
+          // Only if there is a target & it's not already subscribed
+          this.subscribers.push(target)
+        } 
+      }
+      notify() {
+        this.subscribers.forEach(sub => sub())
+      }
+    }
+    
+    // Go through each of our data properties
+    Object.keys(data).forEach(key => {
+      let internalValue = data[key]
+      
+      // Each property gets a dependency instance
+      const dep = new Dep()
+      
+      Object.defineProperty(data, key, {
+        get() {
+          dep.depend() // <-- Remember the target we're running
+          return internalValue
+        },
+        set(newVal) {
+          internalValue = newVal
+          dep.notify() // <-- Re-run stored functions
+        }
+      })
+    })
+    
+    // My watcher no longer calls dep.depend,
+    // since that gets called from inside our get method.
+    function watcher(myFunc) {
+      target = myFunc
+      target()
+      target = null
+    }
+
+    watcher(() => {
+      data.total = data.price * data.quantity
+    })
 
 export default {
   name: 'About',
   data () {
     return {
-        message: 'Old value',
-        isActive: false,
-        error: null,
-        answers: [
-                {text: '0', correct: false, id: 0},
-                {text: '1', correct: false, id: 1},
-                {text: '2', correct: false, id: 2}, 
-                {text: '3', correct: true, id: 3}, 
-                ],
-    }
-  }, 
-  methods: {
-
-          setNewValue: function () {
-            this.message = 'New value';   
-          },
-
-          makeActive: function () {
-                  this.isActive = !this.isActive;  
-                }
-  },
-
-computed: {
-  classObject: function () {
-      if (this.isActive)
-        {
-        var target = event.target || event.srcElement;
-        var id = target.id;
-      console.log(id);
-
-      }
-    return {
-      active: this.isActive,
-      bad1: !this.isActive
-     // 'text-danger': this.error && this.error.type === 'fatal'
+        data,
+      message:"A",
     }
   }
-}
+
 }
 
 
@@ -66,19 +82,5 @@ computed: {
 
 
 <style>
-.active {
-  background: green;
-    font-size: 20px;
-  line-height: 1;
-  letter-spacing: .02em;
-  font-weight: 400;
-}
 
-.bad1 {
-  background: red;
-    font-size: 20px;
-  line-height: 1;
-  letter-spacing: .02em;
-  font-weight: 400;
-}
 </style>
