@@ -41,6 +41,7 @@ export default {
   data () {
     return {
         step: 0,
+        api_status: "up",
         try: 0,
         success: [false,false,false,false,false],
         isQuestion: [true,false,false,false,false],
@@ -208,16 +209,18 @@ export default {
        console.log("player id:" + random_number);
       const api_url = "https://api.football-data.org/v2/players/" + random_number.toString();
 
+      axios.get(api_url)
+
+      .then((response)  =>  {
+        this.loading = false;
+        this.player = response.data;
+
       // a mettre a jour si api is down
-      api_status = "up";
+      this.api_status = "up";
 
-      if (api_status == "up")
+      if (this.api_status == "up")
         {
-        axios.get(api_url)
-
-        .then((response)  =>  {
-          this.loading = false;
-          this.player = response.data;
+        this.playerName = this.player.name;
         }
       else
         {
@@ -245,9 +248,6 @@ export default {
 
         }
       
-
-
-    this.playerName = this.player.name;
     const year = this.player.dateOfBirth.substr(0, 4);
 
     const random_number2 = this.randomIntFromInterval(0,10);
@@ -307,12 +307,11 @@ export default {
       break;
     }
 
-/*
+
 // 3 lignes a rajouter quand api is back!!!!!!
+
       }, (error)  =>  {
-        this.loading = false;
       })
-*/
 
     }
   },
@@ -407,14 +406,12 @@ button {
     left: 40%;
     height: 30%;
     width: 40%;
- opacity: 0.8;
+ opacity: 0.2;
 }
 
 .answer:hover
 {
   opacity:1;
-  /*transition:color .2s ease-out, background 1s ease-in;*/
-
 }
 
 .good {
